@@ -1,0 +1,6 @@
+{
+  "name": "Python CI",
+  "description": "Pinned-action Poetry CI with formatting, linting, type checking, tests, and package build.",
+  "iconName": "octicon checklist",
+  "categories": ["Python", "continuous-integration"]
+}

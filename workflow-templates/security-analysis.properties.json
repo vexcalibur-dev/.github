@@ -1,0 +1,6 @@
+{
+  "name": "Security Analysis",
+  "description": "Pinned-action CodeQL and OpenSSF Scorecard security analysis.",
+  "iconName": "octicon shield-check",
+  "categories": ["Python", "security"]
+}
