@@ -1,0 +1,25 @@
+name: Private disclosure channel request
+description: Ask maintainers for a private security disclosure channel without sharing vulnerability details.
+title: "[Security contact request]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form only when GitHub private vulnerability reporting is unavailable.
+        Do not include vulnerabilities, exploit details, secrets, tokens, private package data, affected package names, logs, stack traces, screenshots, or reproduction steps.
+        Maintainers will use this public issue only to arrange a private disclosure channel.
+  - type: checkboxes
+    id: no_details
+    attributes:
+      label: Public disclosure safety
+      options:
+        - label: I confirm this issue does not include vulnerability details, exploit steps, secrets, tokens, private package data, affected package names, logs, stack traces, screenshots, or reproduction steps.
+          required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Request
+      description: Ask maintainers to provide a private disclosure channel. Do not include security details.
+      placeholder: I cannot use GitHub private vulnerability reporting for this repository. Please provide a private disclosure channel.
+    validations:
+      required: true

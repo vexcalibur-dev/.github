@@ -2,12 +2,33 @@
 
 ## Reporting Vulnerabilities
 
-Please report security issues privately.
+Report security issues privately. Do not open a public issue with vulnerability
+details, exploit steps, secrets, tokens, private package data, or other sensitive
+evidence.
 
-Use GitHub private vulnerability reporting when it is enabled for the affected repository. If private reporting is unavailable, contact the repository maintainers before publishing details.
+Use GitHub private vulnerability reporting from the affected repository's
+Security tab. The currently supported disclosure forms are:
 
-Do not open public issues for vulnerabilities until maintainers have confirmed an appropriate disclosure path.
+- Vexcalibur: <https://github.com/vexcalibur-dev/vexcalibur/security/advisories/new>
+- Vexcalibur Action: <https://github.com/vexcalibur-dev/vexcalibur-action/security/advisories/new>
+- Organization defaults and shared templates: <https://github.com/vexcalibur-dev/.github/security/advisories/new>
+
+For future `vexcalibur-dev` repositories that inherit this default policy, use
+that repository's Security tab when GitHub private vulnerability reporting is
+enabled there.
+
+If GitHub does not allow you to use private vulnerability reporting, use the
+private disclosure channel request issue form. That public issue must only ask
+maintainers to provide a private disclosure channel. Do not include vulnerability
+details in that request.
+
+Maintainers should acknowledge private reports within 3 business days, provide a
+status update at least every 7 calendar days while the report is active, and
+coordinate public disclosure after a fix, mitigation, or no-fix decision is
+ready.
 
 ## Supported Versions
 
-Security support is documented by each repository. Pre-1.0 projects may change supported interfaces quickly, but security fixes should still be released with clear notes.
+Vexcalibur projects are pre-alpha. Security fixes target the default branch
+until versioned releases are published. After releases begin, each repository
+must document which release lines receive security fixes.

@@ -1,6 +1,9 @@
 {
-  "name": "Security Analysis",
-  "description": "Pinned-action CodeQL and OpenSSF Scorecard security analysis.",
+  "name": "Python Security Analysis",
+  "description": "Pinned-action CodeQL and OpenSSF Scorecard analysis for Python repositories.",
   "iconName": "octicon shield-check",
-  "categories": ["Python", "security"]
+  "categories": ["Python", "security"],
+  "filePatterns": [
+    "^pyproject\\.toml$"
+  ]
 }
