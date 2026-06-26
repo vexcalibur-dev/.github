@@ -1,6 +1,9 @@
 {
-  "name": "Python CI",
-  "description": "Pinned-action Poetry CI with formatting, linting, type checking, tests, and package build.",
+  "name": "Python Poetry CI",
+  "description": "Pinned-action CI for Python packages that use Poetry, .python-version, src/, and tests/.",
   "iconName": "octicon checklist",
-  "categories": ["Python", "continuous-integration"]
+  "categories": ["Python", "continuous-integration"],
+  "filePatterns": [
+    "^poetry\\.lock$"
+  ]
 }

@@ -3,6 +3,11 @@ description: Report a reproducible problem.
 title: "[Bug]: "
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include vulnerabilities, exploit details, secrets, tokens, private package data, or sensitive logs in public issues.
+        Use GitHub private vulnerability reporting from the repository Security tab, or ask maintainers for a private disclosure channel without sharing details.
   - type: textarea
     id: summary
     attributes:
@@ -30,4 +35,4 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include operating system, Python version, tool version, and relevant CI details.
+      description: Include operating system, Python version, tool version, and relevant CI details. Redact secrets, tokens, private package names, and sensitive paths.

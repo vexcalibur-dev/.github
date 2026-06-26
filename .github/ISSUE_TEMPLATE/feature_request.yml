@@ -3,6 +3,11 @@ description: Suggest a capability or compatibility improvement.
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include vulnerabilities, exploit details, secrets, tokens, private package data, or sensitive logs in public issues.
+        Use GitHub private vulnerability reporting from the repository Security tab, or ask maintainers for a private disclosure channel without sharing details.
   - type: textarea
     id: problem
     attributes:
