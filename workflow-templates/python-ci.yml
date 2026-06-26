@@ -7,7 +7,8 @@ on:
     branches: [$default-branch]
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
 
 env:
   POETRY_CACHE_DIR: /tmp/poetry-cache
@@ -21,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install Poetry
         run: pipx install "poetry==${POETRY_VERSION}"
@@ -49,6 +52,23 @@ jobs:
       - name: Type check
         run: poetry run mypy src
 
+      - name: Audit Python dependencies
+        run: poetry run pip-audit --cache-dir /tmp/python-ci-pip-audit-cache
+
+      - name: Scan pull request for secrets
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "/repos/${GITHUB_REPOSITORY}/contents/.secrets.baseline?ref=${BASE_SHA}" --jq .content \
+            | base64 --decode > /tmp/base.secrets.baseline
+          git ls-files -z | xargs -0 poetry run -- detect-secrets-hook --baseline /tmp/base.secrets.baseline --
+
+      - name: Scan pushed code for secrets
+        if: github.event_name != 'pull_request'
+        run: git ls-files -z | xargs -0 poetry run -- detect-secrets-hook --baseline .secrets.baseline --
+
       - name: Test
         run: poetry run pytest
 
@@ -58,6 +78,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install Poetry
         run: pipx install "poetry==${POETRY_VERSION}"
