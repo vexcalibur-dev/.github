@@ -20,6 +20,10 @@ type checking, tests, and wheel/sdist builds. Repositories with different test
 paths, no package build, no `src/` layout, or tools other than Poetry should copy
 and adapt the workflow instead of selecting the template unchanged.
 
+The Poetry bootstrap install is pinned with `POETRY_VERSION`. Update that value
+intentionally when adopting a newer Poetry release instead of floating the CI
+bootstrap tool at install time.
+
 The metadata uses `poetry.lock` as a coarse availability hint so the template is
 offered mainly to Poetry repositories. It is not a full compatibility check.
 
