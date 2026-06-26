@@ -1,5 +1,7 @@
 # Vexcalibur Dev GitHub Defaults
 
+[![Validate Repository Metadata](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml/badge.svg)](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml)
+
 This repository contains shared GitHub community files and workflow templates for
 the `vexcalibur-dev` organization.
 
