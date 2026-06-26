@@ -1,0 +1,164 @@
+name: Validate Repository Metadata
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PIP_CACHE_DIR: /tmp/pip-cache
+  POETRY_CACHE_DIR: /tmp/poetry-cache
+  PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
+
+jobs:
+  templates:
+    name: Validate workflow templates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Validate YAML and JSON
+        run: |
+          ruby <<'RUBY'
+          require "json"
+          require "yaml"
+
+          (
+            Dir[".github/ISSUE_TEMPLATE/*.yml"] +
+            Dir[".github/workflows/*.yml"] +
+            Dir["workflow-templates/*.yml"]
+          ).sort.each do |path|
+            YAML.safe_load_file(path, permitted_classes: [], permitted_symbols: [], aliases: false)
+            puts "YAML OK #{path}"
+          end
+
+          Dir["workflow-templates/*.json"].sort.each do |path|
+            JSON.parse(File.read(path))
+            puts "JSON OK #{path}"
+          end
+          RUBY
+
+      - name: Render workflow templates
+        id: render
+        run: |
+          tmpdir="$(mktemp -d)"
+          cp workflow-templates/*.yml "$tmpdir"/
+          perl -0pi -e 's/\[\$default-branch\]/[main]/g' "$tmpdir"/*.yml
+          echo "path=$tmpdir" >> "$GITHUB_OUTPUT"
+
+      - name: Run actionlint
+        env:
+          ACTIONLINT_VERSION: v1.7.12
+        run: |
+          go run "github.com/rhysd/actionlint/cmd/actionlint@${ACTIONLINT_VERSION}" \
+            .github/workflows/*.yml \
+            "${{ steps.render.outputs.path }}"/*.yml
+
+      - name: Smoke GitHub API content read
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "/repos/${GITHUB_REPOSITORY}/contents/workflow-templates/README.md?ref=${GITHUB_SHA}" --jq .content \
+            | base64 --decode > /tmp/workflow-templates-readme.md
+          test -s /tmp/workflow-templates-readme.md
+
+  python-security-commands:
+    name: Smoke Python security commands
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        env:
+          POETRY_VERSION: "2.4.1"
+        run: pipx install "poetry==${POETRY_VERSION}"
+
+      - name: Create fixture package
+        run: |
+          fixture="$(mktemp -d)"
+          echo "fixture=$fixture" >> "$GITHUB_ENV"
+          cd "$fixture"
+          git init --initial-branch=main
+          git config user.email "maintainers@example.com"
+          git config user.name "Vexcalibur Maintainers"
+          mkdir -p src/template_smoke tests
+          touch src/template_smoke/__init__.py
+          touch tests/test_template_smoke.py
+          cat > pyproject.toml <<'TOML'
+          [tool.poetry]
+          name = "template-smoke"
+          version = "0.0.0"
+          description = "Fixture for shared workflow template validation."
+          authors = ["Vexcalibur Maintainers <maintainers@example.com>"]
+          packages = [{ include = "template_smoke", from = "src" }]
+
+          [tool.poetry.dependencies]
+          python = "^3.13"
+
+          [tool.poetry.group.dev.dependencies]
+          detect-secrets = "1.5.0"
+          pip-audit = "2.9.0"
+
+          [build-system]
+          requires = ["poetry-core>=2.0.0,<3.0.0"]
+          build-backend = "poetry.core.masonry.api"
+          TOML
+
+      - name: Install fixture dependencies
+        run: |
+          cd "$fixture"
+          poetry lock
+          poetry install
+
+      - name: Smoke pip-audit command
+        run: |
+          cd "$fixture"
+          poetry run pip-audit --cache-dir /tmp/python-ci-pip-audit-cache
+
+      - name: Smoke detect-secrets enforcement command
+        run: |
+          cd "$fixture"
+          poetry run detect-secrets scan > .secrets.baseline
+          git add .
+          git commit -m "baseline fixture"
+          git ls-files -z | xargs -0 poetry run -- detect-secrets-hook --baseline .secrets.baseline --
+
+      - name: Smoke pull request base-baseline behavior
+        run: |
+          cd "$fixture"
+          base_sha="$(git rev-parse HEAD)"
+          python - <<'PY' > src/template_smoke/leak.py
+          from hashlib import sha256
+
+          print(f'API_TOKEN = "{sha256(b"vexcalibur-template-smoke").hexdigest()}"')
+          PY
+          git add src/template_smoke/leak.py .secrets.baseline
+          poetry run detect-secrets scan --baseline .secrets.baseline
+          git add .secrets.baseline
+          if git ls-files -z | xargs -0 poetry run -- detect-secrets-hook --baseline .secrets.baseline --; then
+            echo "Current baseline suppresses the new fixture secret as expected"
+          else
+            echo "::error::Current baseline did not simulate a same-PR baseline suppression"
+            exit 1
+          fi
+          git show "$base_sha:.secrets.baseline" > /tmp/base.secrets.baseline
+          if git ls-files -z | xargs -0 poetry run -- detect-secrets-hook --baseline /tmp/base.secrets.baseline --; then
+            echo "::error::Base-branch secret baseline did not catch a new fixture secret"
+            exit 1
+          fi
