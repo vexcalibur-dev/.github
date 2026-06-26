@@ -1,5 +1,7 @@
 # Vexcalibur Dev
 
+![](assets/vexcalibur-banner.png)
+
 Vexcalibur Dev builds tools for VEX, SBOM, and vulnerability data workflows.
 
 The projects are pre-alpha unless a repository says otherwise. Public CLIs,
