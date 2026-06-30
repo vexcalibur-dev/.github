@@ -1,12 +1,13 @@
 # Vexcalibur Dev
 
-![](assets/vexcalibur-banner.png)
+![Vexcalibur wordmark and sword logo](assets/vexcalibur-banner.png)
 
 Vexcalibur Dev builds tools for VEX, SBOM, and vulnerability data workflows.
 
-The projects are pre-alpha unless a repository says otherwise. Public CLIs,
-GitHub Action inputs, generated VEX output, and package release interfaces can
-change before the first stable release.
+Project repositories document their current supported workflows and release
+status. Before a repository publishes a stable 1.0 compatibility policy, public
+CLIs, GitHub Action inputs, generated VEX output, and package release interfaces
+can change.
 
 ## Projects
 
