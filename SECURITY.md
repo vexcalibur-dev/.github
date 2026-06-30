@@ -29,6 +29,6 @@ ready.
 
 ## Supported Versions
 
-Vexcalibur projects are pre-alpha. Security fixes target the default branch
-until versioned releases are published. After releases begin, each repository
-must document which release lines receive security fixes.
+Security fixes target the default branch until a repository publishes versioned
+releases. After releases begin, each repository must document which release
+lines receive security fixes.

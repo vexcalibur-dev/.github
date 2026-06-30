@@ -25,10 +25,14 @@ repository. Add a license file to each project repository that needs one.
 
 ## Current Project Status
 
-`vexcalibur-dev` projects are pre-alpha unless a project repository says
-otherwise. Use the [organization profile](profile/README.md) and project
-repository READMEs for current project behavior; this defaults repository only
-owns shared GitHub metadata and workflow-template routing.
+`vexcalibur-dev` project repositories document their own supported workflows,
+release status, and compatibility guarantees. Before a repository publishes a
+stable 1.0 policy, assume public CLIs, GitHub Action inputs, generated output,
+and package release interfaces can change.
+
+Use the [organization profile](profile/README.md) and project repository READMEs
+for current project behavior; this defaults repository only owns shared GitHub
+metadata and workflow-template routing.
 
 ## Security and Support
 
