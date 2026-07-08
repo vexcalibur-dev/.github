@@ -31,10 +31,9 @@ Current project goals include:
 - [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) is the core
   command-line tool and Python library for generating and transforming VEX
   documents from SBOMs and vulnerability data.
-- [Vexcalibur documentation source](https://github.com/vexcalibur-dev/vexcalibur/tree/main/docs)
+- [Vexcalibur documentation](https://vexcalibur-dev.github.io/vexcalibur/)
   provides the quickstart, how-to guides, CLI reference, provider contract, and
-  architecture notes for the core tool while generated documentation publishing
-  is being enabled.
+  architecture notes for the core tool.
 - [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action) is
   the GitHub Action wrapper for running Vexcalibur in repository workflows.
 - [vexcalibur-dev/.github](https://github.com/vexcalibur-dev/.github) contains
