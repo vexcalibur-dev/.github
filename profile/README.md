@@ -2,21 +2,51 @@
 
 ![Vexcalibur wordmark and sword logo](assets/vexcalibur-banner.png)
 
-Vexcalibur Dev builds tools for VEX, SBOM, and vulnerability data workflows.
+Vexcalibur Dev builds open source security automation for Vulnerability
+Exploitability eXchange (VEX), Software Bill of Materials (SBOM), package URL
+(PURL), and vulnerability intelligence workflows.
 
-Project repositories document their current supported workflows and release
-status. Before a repository publishes a stable 1.0 compatibility policy, public
-CLIs, GitHub Action inputs, generated VEX output, and package release interfaces
-can change.
+The project focuses on practical supply chain security tooling: ingest an SBOM,
+query or import vulnerability findings, and produce useful VEX statements that
+fit developer workflows, CI/CD pipelines, GitHub Actions, and downstream
+security reporting.
 
-## Projects
+## What Vexcalibur Is For
 
-- [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur): general-purpose
-  VEX command-line tool and Python library. Use its README and documentation for
-  the current supported workflows.
-- [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action):
-  GitHub Action wrapper for running Vexcalibur in CI workflows. Use its README
-  and `action.yml` for the current action contract.
+Vexcalibur helps teams answer a direct question: which vulnerabilities in this
+software inventory are actually exploitable, affected, fixed, or not affected?
+
+Current project goals include:
+
+- SBOM-driven VEX generation for CycloneDX and GitHub Dependency Graph data.
+- Provider-neutral vulnerability lookup through OSV-compatible services and
+  local no-network findings files.
+- CI-friendly output for security automation, release evidence, and audit
+  workflows.
+- Clear extension points for future VEX, SBOM, vulnerability, and end-of-life
+  software data sources.
+
+## Components
+
+- [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) is the core
+  command-line tool and Python library for generating and transforming VEX
+  documents from SBOMs and vulnerability data.
+- [Vexcalibur documentation source](https://github.com/vexcalibur-dev/vexcalibur/tree/main/docs)
+  provides the quickstart, how-to guides, CLI reference, provider contract, and
+  architecture notes for the core tool while generated documentation publishing
+  is being enabled.
+- [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action) is
+  the GitHub Action wrapper for running Vexcalibur in repository workflows.
+- [vexcalibur-dev/.github](https://github.com/vexcalibur-dev/.github) contains
+  shared organization profile content, community defaults, and workflow
+  templates.
+
+## Status
+
+Vexcalibur is usable today for supported SBOM, OSV-compatible, local findings,
+and CycloneDX VEX workflows. Public contracts remain unstable before 1.0, so
+pin exact versions in automation and check each repository's README and
+documentation for current support details.
 
 ## Security and Support
 
@@ -30,5 +60,5 @@ problems.
 ## Contributing
 
 Start with the contribution guidance in the repository you want to change. The
-organization defaults repository provides shared community files and workflow
-templates for repositories that do not need project-specific copies.
+organization welcomes focused bug reports, compatibility reports, documentation
+fixes, provider ideas, and security automation use cases.
