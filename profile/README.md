@@ -6,7 +6,9 @@ Vexcalibur is an open source toolkit for turning software inventory and vulnerab
 
 The core tool reads CycloneDX 1.4–1.6 JSON or XML software bills of materials (SBOMs). It can also fetch an SPDX 2.3 SBOM from the GitHub Dependency Graph. Findings can come from a local file or an OSV-compatible service.
 
-[Vexcalibur 0.2.0](https://github.com/vexcalibur-dev/vexcalibur/releases/tag/v0.2.0) natively emits [CycloneDX 1.6 VEX JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/cyclonedx-vex-output.html) and [OpenVEX 0.2.0 JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/openvex-output.html).
+[Vexcalibur 0.3.0](https://github.com/vexcalibur-dev/vexcalibur/releases/tag/v0.3.0) natively emits [CycloneDX 1.6 VEX JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/cyclonedx-vex-output.html), [OpenVEX 0.2.0 JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/openvex-output.html), and [CSAF 2.0 JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/csaf-output.html) with the `csaf_vex` profile.
+
+Vexcalibur does not read VEX documents or convert between VEX formats. OpenVEX and CSAF support is output-only.
 
 Vexcalibur does not turn a vulnerability database match into an exploitability decision. OSV findings enter the document as `in_triage`; a local findings file carries the assessment its author supplied.
 
@@ -20,7 +22,7 @@ Vexcalibur uses a 0.x version line. Pin exact releases in automation because com
 
 | Project | What it provides | Availability |
 | --- | --- | --- |
-| [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) | Command-line tool and typed Python library | [Version 0.2.0 on PyPI](https://pypi.org/project/vexcalibur/0.2.0/) |
+| [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) | Command-line tool and typed Python library | [Version 0.3.0 on PyPI](https://pypi.org/project/vexcalibur/0.3.0/) |
 | [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action) | Composite GitHub Action that installs and runs an exact Vexcalibur package release | [Versioned GitHub releases](https://github.com/vexcalibur-dev/vexcalibur-action/releases) |
 | [vexcalibur-orb](https://github.com/vexcalibur-dev/vexcalibur-orb) | CircleCI orb source for the same isolated install and execution boundary | Source is available; no CircleCI registry release yet |
 | [.github](https://github.com/vexcalibur-dev/.github) | Organization profile, community defaults, and optional workflow templates | Used across the organization |
