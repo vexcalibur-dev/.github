@@ -1,12 +1,16 @@
 # Danny Sauer is the primary maintainer for Vexcalibur organization metadata.
 * @dannysauer
 
-# These paths define repository defaults and reusable security workflows.
+# These paths define repository defaults.
 /.github/CODEOWNERS @dannysauer
 /.github/ISSUE_TEMPLATE/ @dannysauer
 /.github/PULL_REQUEST_TEMPLATE.md @dannysauer
-/.github/workflows/ @dannysauer
 /profile/ @dannysauer
 /workflow-templates/ @dannysauer
 /CODE_OF_CONDUCT.md @dannysauer
 /SECURITY.md @dannysauer
+
+# Keep security automation last so later rules cannot replace its owner.
+/.github/dependabot.yml @dannysauer
+/.github/scripts/ @dannysauer
+/.github/workflows/ @dannysauer
