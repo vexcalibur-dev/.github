@@ -1,6 +1,6 @@
 {
   "name": "Python Security Analysis",
-  "description": "Pinned-action Dependency Review, CodeQL, and OpenSSF Scorecard analysis for Python repositories.",
+  "description": "Run Dependency Review, CodeQL, and OpenSSF Scorecard for Python repositories.",
   "iconName": "octicon shield-check",
   "categories": ["Python", "security"],
   "filePatterns": [

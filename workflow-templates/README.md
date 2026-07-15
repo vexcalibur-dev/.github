@@ -1,74 +1,89 @@
-# Workflow Templates
+# Workflow templates
 
-These templates are shared starting points for `vexcalibur-dev` repositories.
-They are intentionally scoped. GitHub `filePatterns` only control when a
-template is offered based on matching root files; they do not prove all
-prerequisites are present. Review the prerequisites before applying a template.
+These templates appear on the **Actions** > **New workflow** page for repositories in the `vexcalibur-dev` organization. GitHub copies the selected file into the repository. From that point on, the repository owns its copy and changes here do not flow into it.
+
+The metadata `filePatterns` are suggestion filters, not compatibility checks. Check every prerequisite before you select a template.
+
+## Choose a template
+
+| Template | Use it when | GitHub suggests it when |
+| --- | --- | --- |
+| `python-ci.yml` | A Poetry package uses the required layout and quality tools | `poetry.lock` exists at the repository root |
+| `security-analysis.yml` | A Python repository can run Dependency Review, CodeQL, and OpenSSF Scorecard | `pyproject.toml` exists at the repository root |
+
+You can use both templates in one repository. Neither replaces release checks or project-specific tests.
 
 ## Python Poetry CI
 
-Use `python-ci.yml` for Python packages that have:
+### Poetry CI prerequisites
 
-- `.python-version` with a GitHub Actions-supported Python version.
-- `pyproject.toml` and `poetry.lock`.
-- source code under `src/`.
-- tests under `tests/`.
-- Poetry-managed commands for `ruff`, `mypy`, `pytest`, and package builds.
-- Poetry-managed development dependencies for `pip-audit` and
-  `detect-secrets`.
-- a committed `.secrets.baseline` created with
-  `detect-secrets scan > .secrets.baseline`.
+Use `python-ci.yml` unchanged only when the repository has all of the following:
 
-The template runs package metadata checks, lock-file checks, formatting, linting,
-type checking, dependency audit, secret scanning, tests, and wheel/sdist builds.
-Repositories with different test paths, no package build, no `src/` layout, no
-secret baseline, or tools other than Poetry should copy and adapt the workflow
-instead of selecting the template unchanged.
+- A `.python-version` file containing a version supported by GitHub Actions.
+- `pyproject.toml` and `poetry.lock` at the root.
+- Importable package code under `src/`.
+- Tests under `tests/`.
+- Poetry-managed commands for Ruff, mypy, pytest, and package builds.
+- Poetry development dependencies for `pip-audit` and `detect-secrets`.
+- A committed `.secrets.baseline` created by `poetry run detect-secrets scan > .secrets.baseline`.
 
-The secret scan uses `detect-secrets-hook` over tracked files so newly
-introduced secrets fail CI. Pull requests are checked against the base branch's
-committed `.secrets.baseline`, which prevents a PR from suppressing a new secret
-by updating the baseline in the same change. Push and manual runs use the
-current checkout's `.secrets.baseline`. Use
-`detect-secrets scan --baseline .secrets.baseline` only when intentionally
-refreshing the baseline in a separate reviewed maintenance change.
+If the project uses different paths, another package manager, no distribution build, or a different test layout, adapt the copied workflow before you merge it.
 
-The Poetry bootstrap install is pinned with `POETRY_VERSION`. Update that value
-intentionally when adopting a newer Poetry release instead of floating the CI
-bootstrap tool at install time.
+### Checks
 
-The metadata uses `poetry.lock` as a coarse availability hint so the template is
-offered mainly to Poetry repositories. It is not a full compatibility check.
+The workflow runs on pull requests and pushes to the default branch. It also supports manual runs.
 
-## Python Security Analysis
+| Job | Checks |
+| --- | --- |
+| `quality` | Package metadata, lock consistency, Ruff formatting and linting, mypy, dependency audit, secret scan, and pytest |
+| `build` | Wheel and source-distribution build |
 
-Use `security-analysis.yml` for Python repositories where Dependency Review,
-CodeQL, and OpenSSF Scorecard should run. The repository must allow GitHub
-Actions to write security events. Public repositories should also enable GitHub
-private vulnerability reporting, Dependabot security updates, secret scanning,
-and push protection.
+The workflow installs Poetry at the version in `POETRY_VERSION`. Update that value in a reviewed pull request; do not replace it with a floating install.
 
-The Dependency Review job only runs on pull requests and requires the dependency
-graph to be enabled. GitHub supports the dependency review action for public
-repositories and for private repositories with GitHub Code Security or GitHub
-Advanced Security enabled. CodeQL and OpenSSF Scorecard run on pull requests,
-pushes, schedules, and manual dispatch. The template does not replace
-repository-specific release gates.
+### Secret baseline behavior
 
-Dependency Review PR comments are disabled in the shared template so fork and
-Dependabot pull requests can run with a read-only `GITHUB_TOKEN`. Repositories
-that want PR comments can opt in locally by changing `comment-summary-in-pr` and
-granting `pull-requests: write`; those runs may still be limited by GitHub's
-fork and Dependabot token rules.
+Pull request runs fetch `.secrets.baseline` from the exact base commit and scan every tracked file against it. A pull request cannot hide a new secret by changing the baseline in the same branch.
 
-The metadata uses `pyproject.toml` as a coarse availability hint for Python
-repositories. It is not a full compatibility check.
+Push and manual runs use the baseline from the checked-out commit. When a legitimate change requires a baseline update, run this command and submit the result as a separate maintenance change:
 
-## Dependabot Guidance
+```bash
+poetry run detect-secrets scan --baseline .secrets.baseline
+```
 
-Add a repository-local `.github/dependabot.yml`; GitHub does not apply one from
-this defaults repository. For a Poetry-based Python package with pinned GitHub
-Actions, use this as a starting point:
+Review every new baseline entry before you merge it. A baseline suppresses detection; it does not make the matched value safe to publish.
+
+## Python security analysis
+
+### Security analysis prerequisites
+
+Use `security-analysis.yml` when all of these conditions hold:
+
+- The repository contains Python that CodeQL should analyze.
+- GitHub Actions can write security events for CodeQL and SARIF uploads.
+- The dependency graph is enabled.
+- The repository is public, or its GitHub plan enables the required code-security features.
+
+The dependency review action is available to public repositories. Private repositories need GitHub Code Security or GitHub Advanced Security. Confirm current availability in the [GitHub dependency review documentation](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review).
+
+### Checks and events
+
+| Job | Events | Behavior |
+| --- | --- | --- |
+| `dependency-review` | Pull requests | Fails when a dependency change introduces a vulnerability rated high or critical; PR comments are disabled |
+| `codeql` | Pull requests, pushes, weekly schedule, manual runs | Analyzes Python with the `security-and-quality` query suite and uploads results |
+| `scorecard` | Pull requests, pushes, weekly schedule, manual runs | Runs OpenSSF Scorecard and uploads `scorecard.sarif`; public Scorecard result publishing is disabled |
+
+The schedule runs each Monday at 08:41 UTC.
+
+PR comments stay disabled so the dependency review job only needs `contents: read`. If a repository enables comments in its copy, set `comment-summary-in-pr` as needed and add `pull-requests: write`. Fork and Dependabot pull requests can still receive reduced token permissions.
+
+The template does not enable repository settings. After adding it, confirm the dependency graph, code scanning, private vulnerability reporting, Dependabot security updates, secret scanning, and push protection that apply to the repository.
+
+## Add Dependabot updates
+
+GitHub does not inherit `.github/dependabot.yml` from this repository. Add one to each project that needs version updates.
+
+This example groups weekly Poetry and GitHub Actions updates. Change the schedule and grouping to fit the repository's maintenance window.
 
 ```yaml
 version: 2
@@ -96,14 +111,11 @@ updates:
           - "*"
 ```
 
-Adjust schedules and grouping for each repository's maintenance window.
+## Validate template changes
 
-## Validation
+Run these checks from the `.github` repository root in Bash. You need Ruby with its `json` and `yaml` standard libraries, Perl, and Go.
 
-The repository's `Validate Repository Metadata` workflow runs YAML/JSON checks,
-rendered-template `actionlint`, a GitHub API content-read smoke check, and a
-minimal Poetry fixture smoke test for the Python security commands. Before
-changing these templates, also validate the files from this repository root:
+Parse every YAML and JSON file:
 
 ```bash
 ruby <<'RUBY'
@@ -126,13 +138,16 @@ end
 RUBY
 ```
 
-Run `actionlint` against rendered copies of workflow templates because GitHub
-template placeholders such as `$default-branch` are not valid workflow syntax
-outside the template renderer.
+Render `$default-branch` before running `actionlint`; the placeholder is valid only while GitHub creates a workflow from the template.
 
 ```bash
 tmpdir="$(mktemp -d)"
 cp workflow-templates/*.yml "$tmpdir"/
 perl -0pi -e 's/\[\$default-branch\]/[main]/g' "$tmpdir"/*.yml
-ASDF_ACTIONLINT_VERSION=1.7.12 actionlint .github/workflows/*.yml "$tmpdir"/*.yml
+go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 \
+  .github/workflows/*.yml \
+  "$tmpdir"/*.yml
+rm -rf "$tmpdir"
 ```
+
+The `Validate repository metadata` workflow adds a GitHub API content-read check and runs the Python security commands in a temporary Poetry package. Both jobs must pass before a template change is ready to merge.

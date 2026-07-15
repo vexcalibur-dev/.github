@@ -1,0 +1,23 @@
+name: Private conduct channel request
+description: Ask maintainers for a private channel without describing the conduct concern publicly.
+title: "[Private conduct contact request]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form creates a public issue. Do not name anyone, describe the incident, or include messages, screenshots, links, or personal information. A maintainer will use the issue only to arrange a private channel.
+  - type: checkboxes
+    id: no_details
+    attributes:
+      label: Public-data check
+      options:
+        - label: I confirm that this public issue names no person and contains no conduct details or personal information.
+          required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Request
+      description: Ask the maintainers to arrange a private conduct channel. Include no other information.
+      placeholder: Please arrange a private channel for a conduct concern.
+    validations:
+      required: true

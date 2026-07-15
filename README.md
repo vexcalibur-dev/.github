@@ -1,53 +1,44 @@
-# Vexcalibur Dev GitHub Defaults
+# Vexcalibur organization defaults
 
-[![Validate Repository Metadata](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml/badge.svg)](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml)
+[![Validate repository metadata](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml/badge.svg)](https://github.com/vexcalibur-dev/.github/actions/workflows/validate-repository-metadata.yml)
 
-This repository contains shared GitHub community files and workflow templates for
-the `vexcalibur-dev` organization.
+This public `.github` repository holds the shared GitHub profile, community files, and workflow templates for the [`vexcalibur-dev` organization](https://github.com/vexcalibur-dev). It has no runtime package of its own.
 
-GitHub applies supported files from this repository to public organization
-repositories that do not provide their own copies. Individual repositories can
-override these defaults when they need project-specific guidance.
+GitHub uses the community files here when a public organization repository does not provide a file of the same type. A repository can replace any default with guidance that fits its own release or development process.
 
-## Repository Role
+## What lives here
 
-The shared files in this repository provide:
+| Path | Purpose |
+| --- | --- |
+| [`profile/README.md`](profile/README.md) | Public organization profile |
+| [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) | Default issue forms and issue-chooser links |
+| [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) | Default pull request template |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidance for repositories without a local guide |
+| [`SECURITY.md`](SECURITY.md) | Private reporting routes and the default support policy for security fixes |
+| [`SUPPORT.md`](SUPPORT.md) | Routes for questions, bugs, and feature requests |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Conduct and moderation policy |
+| [`workflow-templates/`](workflow-templates/) | Optional Python CI and security workflows |
 
-- organization profile content in [profile/README.md](profile/README.md);
-- default bug, feature, security-contact, and pull request templates in
-  [.github/](.github/);
-- default support, security, contribution, and conduct files;
-- workflow templates for Python Poetry CI and Python security analysis in
-  [workflow-templates/](workflow-templates/).
+The [`LICENSE`](LICENSE) covers this repository. GitHub does not inherit a license from an organization defaults repository, so every project must carry its own license file.
 
-GitHub does not apply a default license file from an organization `.github`
-repository. Add a license file to each project repository that needs one.
+## How inheritance works
 
-## Current Project Status
+A local community file wins over the organization default. Issue forms are the exception worth remembering: if a repository has any file in its own `.github/ISSUE_TEMPLATE/` directory, GitHub does not add the forms from this repository.
 
-`vexcalibur-dev` project repositories document their own supported workflows,
-release status, and compatibility guarantees. Before a repository publishes a
-stable 1.0 policy, assume public CLIs, GitHub Action inputs, generated output,
-and package release interfaces can change.
+Workflow templates are not inherited. A maintainer chooses one from the repository's **Actions** page, and GitHub copies it into that repository. Later changes here do not update existing copies.
 
-Use the [organization profile](profile/README.md) and project repository READMEs
-for current project behavior; this defaults repository only owns shared GitHub
-metadata and workflow-template routing.
+The `filePatterns` in each workflow template only decide when GitHub suggests it. They do not check the repository's layout, tools, permissions, or security settings. Read the [workflow template guide](workflow-templates/README.md) before using one.
 
-## Security and Support
+## Validate a change
 
-Report vulnerabilities privately through the affected repository's Security tab.
-If GitHub private vulnerability reporting is unavailable, use the inherited
-private disclosure channel request issue form and do not include vulnerability
-details or sensitive data in the public request.
+Run the metadata checks from the repository root. The [workflow template guide](workflow-templates/README.md#validate-template-changes) contains the exact local commands and their prerequisites.
 
-Use GitHub issues for non-security bugs, feature requests, and compatibility
-problems. The inherited issue forms warn users not to post vulnerabilities,
-exploit details, secrets, tokens, private package data, logs, stack traces,
-screenshots, or reproduction steps in public issues.
+The `Validate repository metadata` workflow checks YAML and JSON, renders the default-branch placeholder, runs `actionlint`, and exercises the Python security commands in a temporary fixture. A successful pull request has both workflow jobs passing.
 
-## Workflow Templates
+## Project links
 
-See [workflow-templates/README.md](workflow-templates/README.md) before applying
-a template. GitHub `filePatterns` only control when a template is offered based
-on matching root files; they are not a full compatibility check.
+- Meet the projects on the [Vexcalibur organization profile](profile/README.md).
+- Use the [Vexcalibur manual](https://vexcalibur-dev.github.io/vexcalibur/) for the command-line tool and Python library.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing shared defaults.
+- Report vulnerabilities through [SECURITY.md](SECURITY.md), not a public issue.
+- Use [SUPPORT.md](SUPPORT.md) for questions and non-security problems.
