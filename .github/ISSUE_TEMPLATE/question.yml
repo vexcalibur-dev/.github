@@ -1,0 +1,37 @@
+name: Question
+description: Ask for help with documented, non-sensitive behavior.
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the project README and reference docs first. This issue will be public, so use synthetic or already-public examples.
+
+        For a suspected vulnerability, stop and use private vulnerability reporting from the repository's Security page.
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      description: Describe the result you need and the Vexcalibur project you are using.
+    validations:
+      required: true
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What have you tried?
+      description: Include sanitized commands or workflow excerpts and the docs you followed.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include project version, operating system, Python version, and CI runner when relevant.
+  - type: checkboxes
+    id: public_data
+    attributes:
+      label: Public-data check
+      options:
+        - label: I removed credentials, vulnerability details, private package data, internal URLs, sensitive paths, and personal information.
+          required: true

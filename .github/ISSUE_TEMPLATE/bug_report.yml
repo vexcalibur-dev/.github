@@ -1,25 +1,26 @@
 name: Bug report
-description: Report a reproducible problem.
+description: Report a reproducible failure in public, non-sensitive behavior.
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Do not include vulnerabilities, exploit details, secrets, tokens, private package data, or sensitive logs in public issues.
-        Use GitHub private vulnerability reporting from the repository Security tab, or ask maintainers for a private disclosure channel without sharing details.
+        This issue will be public. Use synthetic or already-public examples and redact logs.
+
+        If the problem may be a vulnerability, stop and use private vulnerability reporting from the repository's Security page. Do not put exploit details, credentials, private package data, or other sensitive evidence here.
   - type: textarea
     id: summary
     attributes:
-      label: Summary
-      description: What happened?
+      label: What happened?
+      description: Describe the failure and its effect.
     validations:
       required: true
   - type: textarea
-    id: steps
+    id: reproduction
     attributes:
-      label: Reproduction
-      description: Steps, input files, package URLs, or commands needed to reproduce the problem.
+      label: Minimal reproduction
+      description: Give the smallest command or workflow that reproduces the problem. Use synthetic package URLs and sanitized input.
       placeholder: |
         1. Run ...
         2. Observe ...
@@ -29,10 +30,25 @@ body:
     id: expected
     attributes:
       label: Expected behavior
+      description: Describe the result you expected and why.
     validations:
       required: true
   - type: textarea
     id: environment
     attributes:
       label: Environment
-      description: Include operating system, Python version, tool version, and relevant CI details. Redact secrets, tokens, private package names, and sensitive paths.
+      description: Include the Vexcalibur project and version, operating system, Python version, and relevant CI runner. Redact private names and paths.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Add the smallest redacted output that helps explain the failure. Do not attach a private SBOM or unredacted log.
+  - type: checkboxes
+    id: public_data
+    attributes:
+      label: Public-data check
+      options:
+        - label: I removed credentials, vulnerability details, private package data, internal URLs, sensitive paths, and personal information.
+          required: true

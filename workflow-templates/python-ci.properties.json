@@ -1,6 +1,6 @@
 {
   "name": "Python Poetry CI",
-  "description": "Pinned-action CI for Python packages that use Poetry, .python-version, src/, and tests/.",
+  "description": "Run Poetry package checks, tests, builds, dependency audit, and secret scanning for compatible Python repositories.",
   "iconName": "octicon checklist",
   "categories": ["Python", "continuous-integration"],
   "filePatterns": [

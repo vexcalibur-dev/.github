@@ -1,29 +1,32 @@
-## Summary
+## Problem and approach
 
-- 
+Describe the problem this pull request solves and the approach you chose.
 
 ## Verification
 
-- 
+List the exact commands or checks you ran and their results. Name anything you could not verify.
 
-## Documentation Impact
+- [ ] Tests cover changed behavior, or this pull request does not change behavior.
+- [ ] The required local and CI checks pass.
 
-- [ ] Docs are not affected.
-- [ ] Docs were updated.
-- [ ] Docs need a follow-up issue:
+## Documentation
 
-## Compatibility Impact
+Choose the first or second option. Add a follow-up only when this pull request cannot contain the required docs.
 
-- [ ] No public interface, CLI, action input, output, workflow-template, or
-      compatibility behavior changed.
-- [ ] Compatibility impact is described here:
+- [ ] User-facing docs changed with the behavior.
+- [ ] Existing docs remain accurate; no update is needed.
+- [ ] Follow-up work is tracked here:
 
-## Security Notes
+## Compatibility
 
-- [ ] This PR does not include secrets, tokens, private vulnerability details,
-      private package data, logs, stack traces, screenshots, or other sensitive
-      evidence.
-- [ ] This PR changes security-sensitive behavior, docs, permissions, workflow
-      tokens, dependency handling, or public-service data sharing:
+Choose one.
+
+- [ ] No public command, Python API, action input, output, workflow template, or compatibility contract changed.
+- [ ] The impact and required migration are described here:
+
+## Security and privacy
+
+- [ ] This pull request contains no credentials, private vulnerability details, private package data, sensitive logs, stack traces, screenshots, or other private evidence.
+- [ ] Changes to permissions, dependency handling, network access, workflow tokens, or other security-sensitive behavior are described here:
 
 Use private vulnerability reporting for security disclosures.
