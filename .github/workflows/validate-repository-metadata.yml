@@ -25,26 +25,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate YAML and JSON
-        run: |
-          ruby <<'RUBY'
-          require "json"
-          require "yaml"
+      - name: Test metadata policy enforcement
+        run: ruby .github/scripts/validate-repository-metadata-test.rb
 
-          (
-            Dir[".github/ISSUE_TEMPLATE/*.yml"] +
-            Dir[".github/workflows/*.yml"] +
-            Dir["workflow-templates/*.yml"]
-          ).sort.each do |path|
-            YAML.safe_load_file(path, permitted_classes: [], permitted_symbols: [], aliases: false)
-            puts "YAML OK #{path}"
-          end
-
-          Dir["workflow-templates/*.json"].sort.each do |path|
-            JSON.parse(File.read(path))
-            puts "JSON OK #{path}"
-          end
-          RUBY
+      - name: Validate metadata and security policy
+        run: ruby .github/scripts/validate-repository-metadata.rb
 
       - name: Render workflow templates
         id: render

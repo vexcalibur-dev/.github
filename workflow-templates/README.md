@@ -71,17 +71,21 @@ The dependency review action is available to public repositories. Private reposi
 | --- | --- | --- |
 | `dependency-review` | Pull requests | Fails when a dependency change introduces a vulnerability rated high or critical; PR comments are disabled |
 | `codeql` | Pull requests, pushes, weekly schedule, manual runs | Analyzes Python with the `security-and-quality` query suite and uploads results |
-| `scorecard` | Pull requests, pushes, weekly schedule, manual runs | Runs OpenSSF Scorecard and uploads `scorecard.sarif`; public Scorecard result publishing is disabled |
+| `scorecard` | Pushes and weekly schedule | Runs OpenSSF Scorecard and uploads `scorecard.sarif`; public Scorecard result publishing is disabled |
 
 The schedule runs each Monday at 08:41 UTC.
 
 PR comments stay disabled so the dependency review job only needs `contents: read`. If a repository enables comments in its copy, set `comment-summary-in-pr` as needed and add `pull-requests: write`. Fork and Dependabot pull requests can still receive reduced token permissions.
+
+Public Scorecard API publication is disabled, so the Scorecard job does not request an OpenID Connect token. It retains only the read permissions needed to inspect repository signals and `security-events: write` for the repository's SARIF upload.
 
 The template does not enable repository settings. After adding it, confirm the dependency graph, code scanning, private vulnerability reporting, Dependabot security updates, secret scanning, and push protection that apply to the repository.
 
 ## Add Dependabot updates
 
 GitHub does not inherit `.github/dependabot.yml` from this repository. Add one to each project that needs version updates.
+
+Dependabot's `github-actions` ecosystem scans `.github/workflows/` and root action metadata; it does not maintain the copied files under this repository's `workflow-templates/` directory. Maintainers must review upstream releases, update each template's version comment and full commit SHA together, and run the validation commands below. The repository validator rejects mutable references, but it cannot decide when a pinned release has become stale.
 
 This example groups weekly Poetry and GitHub Actions updates. Change the schedule and grouping to fit the repository's maintenance window.
 
@@ -115,28 +119,14 @@ updates:
 
 Run these checks from the `.github` repository root in Bash. You need Ruby with its `json` and `yaml` standard libraries, Perl, and Go.
 
-Parse every YAML and JSON file:
+Run the repository metadata and security-policy validator:
 
 ```bash
-ruby <<'RUBY'
-require "json"
-require "yaml"
-
-(
-  Dir[".github/ISSUE_TEMPLATE/*.yml"] +
-  Dir[".github/workflows/*.yml"] +
-  Dir["workflow-templates/*.yml"]
-).sort.each do |path|
-  YAML.safe_load_file(path, permitted_classes: [], permitted_symbols: [], aliases: false)
-  puts "YAML OK #{path}"
-end
-
-Dir["workflow-templates/*.json"].sort.each do |path|
-  JSON.parse(File.read(path))
-  puts "JSON OK #{path}"
-end
-RUBY
+ruby .github/scripts/validate-repository-metadata-test.rb
+ruby .github/scripts/validate-repository-metadata.rb
 ```
+
+The validator parses every YAML and JSON metadata file, requires full commit-SHA pins for remote GitHub Actions, and fails closed if the repository-level Scorecard, Dependabot, or code-ownership policy drifts from its reviewed boundary.
 
 Render `$default-branch` before running `actionlint`; the placeholder is valid only while GitHub creates a workflow from the template.
 
