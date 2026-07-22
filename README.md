@@ -12,7 +12,7 @@ GitHub uses the community files here when a public organization repository does 
 | Path | Purpose |
 | --- | --- |
 | [`profile/README.md`](profile/README.md) | Public organization profile |
-| [`.github/dependabot.yml`](.github/dependabot.yml) | Weekly updates for pinned actions in `.github/workflows/` |
+| [`renovate.json`](renovate.json) | Weekly grouped Renovate updates requiring review |
 | [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) | Default issue forms and issue-chooser links |
 | [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) | Default pull request template |
 | [`.github/scripts/`](.github/scripts/) | Metadata parser and security-policy drift tests |
@@ -37,9 +37,13 @@ The `filePatterns` in each workflow template only decide when GitHub suggests it
 
 Run the metadata checks from the repository root. The [workflow template guide](workflow-templates/README.md#validate-template-changes) contains the exact local commands and their prerequisites.
 
-The `Validate repository metadata` workflow checks YAML and JSON, rejects mutable GitHub Action references, tests and verifies the reviewed Scorecard and Dependabot policies, renders the default-branch placeholder, runs `actionlint`, and exercises the Python security commands in a temporary fixture. A successful pull request has both workflow jobs passing.
+The `Validate repository metadata` workflow checks YAML and JSON, rejects mutable GitHub Action references, tests and verifies the reviewed Scorecard and Renovate policies, renders the default-branch placeholder, runs `actionlint`, and exercises the Python security commands in a temporary fixture. A successful pull request has both workflow jobs passing.
 
-The repository's own OpenSSF Scorecard workflow runs after changes to `main` and on a weekly schedule. It sends SARIF to this repository's GitHub code-scanning dashboard. Public Scorecard API publication stays disabled, so the workflow does not request an OpenID Connect token.
+The repository's own OpenSSF Scorecard workflow runs after changes to `main`
+and on a weekly schedule. It sends a Static Analysis Results Interchange Format
+(SARIF) report to this repository's GitHub code-scanning dashboard. Public
+Scorecard API publication stays disabled, so the workflow does not request an
+OpenID Connect token.
 
 ## Project links
 
