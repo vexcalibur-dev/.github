@@ -28,6 +28,9 @@ class RepositoryMetadataValidator
     "labels" => ["dependencies"],
     "prConcurrentLimit" => 5,
     "prHourlyLimit" => 2,
+    "minimumReleaseAge" => "5 days",
+    "minimumReleaseAgeBehaviour" => "timestamp-required",
+    "internalChecksFilter" => "strict",
     "enabledManagers" => ["github-actions"],
     "vulnerabilityAlerts" => {
       "enabled" => false,

@@ -96,6 +96,11 @@ confirm that a pull request with a failing required check cannot auto-merge.
 
 Renovate updates workflow and action metadata, including this repository's `workflow-templates/` files. It keeps each action on a full commit SHA and updates the adjacent version comment with it. It creates ordinary update branches on Monday mornings in `America/Chicago`; `config:recommended` may group related dependencies. For ordinary updates, Renovate creates at most two pull requests an hour and keeps at most five open. Dependabot remains responsible for vulnerability-fix pull requests, so the policy disables Renovate vulnerability alerts. Every Renovate update remains an ordinary pull request for review.
 
+Renovate waits five days before it creates a branch for a normal dependency
+update. It requires a registry release timestamp, and a release without a
+trusted timestamp stays pending. Security fixes are not delayed; Dependabot
+opens those pull requests as soon as it identifies them.
+
 The `enabledManagers` list is deliberate. Add a manager only after the
 repository has checks that exercise its updates. It decides which dependency
 types Renovate may update.
@@ -118,6 +123,9 @@ duplicate vulnerability updates.
   "labels": ["dependencies"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
+  "minimumReleaseAge": "5 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
+  "internalChecksFilter": "strict",
   "enabledManagers": ["github-actions"],
   "vulnerabilityAlerts": {
     "enabled": false

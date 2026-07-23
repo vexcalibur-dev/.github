@@ -315,6 +315,19 @@ class RepositoryMetadataValidatorTest < Minitest::Test
     end
   end
 
+  def test_rejects_renovate_minimum_release_age_drift
+    with_repository_copy do |root|
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["minimumReleaseAge"] = "4 days"
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
+
+      result, _output, errors = validate(root)
+
+      refute result
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
+    end
+  end
+
   def test_rejects_renovate_without_action_digest_pinning
     with_repository_copy do |root|
       renovate = JSON.parse(root.join("renovate.json").read)
