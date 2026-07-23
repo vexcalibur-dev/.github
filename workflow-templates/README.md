@@ -59,7 +59,8 @@ Review every new baseline entry before you merge it. A baseline suppresses detec
 Use `security-analysis.yml` when all of these conditions hold:
 
 - The repository contains Python that CodeQL should analyze.
-- GitHub Actions can write security events for CodeQL and SARIF uploads.
+- GitHub Actions can write security events for CodeQL and Static Analysis
+  Results Interchange Format (SARIF) uploads.
 - The dependency graph is enabled.
 - The repository is public, or its GitHub plan enables the required code-security features.
 
@@ -81,43 +82,76 @@ Public Scorecard API publication is disabled, so the Scorecard job does not requ
 
 The template does not enable repository settings. After adding it, confirm the dependency graph, code scanning, private vulnerability reporting, Dependabot security updates, secret scanning, and push protection that apply to the repository.
 
-## Add Dependabot updates
+## Add Renovate updates
 
-GitHub does not inherit `.github/dependabot.yml` from this repository. Add one to each project that needs version updates.
+Each project needs its own `renovate.json`; Renovate reads the configuration from that project's default branch. The shared repository does not supply an inherited configuration.
 
-Dependabot's `github-actions` ecosystem scans `.github/workflows/` and root action metadata; it does not maintain the copied files under this repository's `workflow-templates/` directory. Maintainers must review upstream releases, update each template's version comment and full commit SHA together, and run the validation commands below. The repository validator rejects mutable references, but it cannot decide when a pinned release has become stale.
+### Prerequisites
 
-This example groups weekly Poetry and GitHub Actions updates. Change the schedule and grouping to fit the repository's maintenance window.
+Give Renovate access to the repository, then confirm that the dependency graph,
+Dependabot alerts, and Dependabot security updates are enabled. The policy below
+deliberately leaves auto-merge disabled. If you later enable it, first protect
+the default branch with every CI check that must gate dependency updates. Then
+confirm that a pull request with a failing required check cannot auto-merge.
 
-```yaml
-version: 2
-updates:
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"
+Renovate updates workflow and action metadata, including this repository's `workflow-templates/` files. It keeps each action on a full commit SHA and updates the adjacent version comment with it. It creates ordinary update branches on Monday mornings in `America/Chicago`; `config:recommended` may group related dependencies. For ordinary updates, Renovate creates at most two pull requests an hour and keeps at most five open. Dependabot remains responsible for vulnerability-fix pull requests, so the policy disables Renovate vulnerability alerts. Every Renovate update remains an ordinary pull request for review.
 
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:30"
-    groups:
-      github-actions:
-        patterns:
-          - "*"
+Renovate waits five days before it creates a branch for a normal dependency
+update. It requires a registry release timestamp, and a release without a
+trusted timestamp stays pending. Security fixes are not delayed; Dependabot
+opens those pull requests as soon as it identifies them.
+
+The `enabledManagers` list is deliberate. Add a manager only after the
+repository has checks that exercise its updates. It decides which dependency
+types Renovate may update.
+
+When migrating from Dependabot version updates, merge the Renovate configuration
+first. Then close the remaining Dependabot version-update pull requests without
+merging them before Renovate's first scheduled window. Keep Dependabot alerts
+and security updates enabled; the configuration below disables only Renovate's
+duplicate vulnerability updates.
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "America/Chicago",
+  "schedule": ["* 8-11 * * 1"],
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "minimumReleaseAge": "5 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
+  "internalChecksFilter": "strict",
+  "enabledManagers": ["github-actions"],
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "description": "Group reviewable GitHub Actions updates.",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}
 ```
+
+For a Renovate configuration change, open the pull request from a branch named
+`renovate/reconfigure` in the repository where Renovate is installed. Renovate
+does not validate branches in forks. Fork-based contributors should ask a
+maintainer to push the branch to the source repository before relying on the
+`renovate/config-validation` check. Merge only after it and the repository's
+other required checks pass.
 
 ## Validate template changes
 
-Run these checks from the `.github` repository root in Bash. You need Ruby with its `json` and `yaml` standard libraries, Perl, and Go.
+Run these checks from the `.github` repository root in Bash. You need Ruby
+with its `json` and `yaml` standard libraries, Perl, Go, and network access
+to the Go module proxy unless the Actionlint module is already cached.
 
 Run the repository metadata and security-policy validator:
 
@@ -126,7 +160,7 @@ ruby .github/scripts/validate-repository-metadata-test.rb
 ruby .github/scripts/validate-repository-metadata.rb
 ```
 
-The validator parses every YAML and JSON metadata file, requires full commit-SHA pins for remote GitHub Actions, and fails closed if the repository-level Scorecard, Dependabot, or code-ownership policy drifts from its reviewed boundary.
+The validator parses every YAML and JSON metadata file, requires full commit-SHA pins for remote GitHub Actions, and fails closed if the repository-level Scorecard, Renovate, or code-ownership policy drifts from its reviewed boundary.
 
 Render `$default-branch` before running `actionlint`; the placeholder is valid only while GitHub creates a workflow from the template.
 

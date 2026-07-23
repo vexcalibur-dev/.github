@@ -289,57 +289,71 @@ class RepositoryMetadataValidatorTest < Minitest::Test
     end
   end
 
-  def test_rejects_incomplete_dependabot_group
+  def test_rejects_renovate_schedule_drift
     with_repository_copy do |root|
-      dependabot = root.join(".github/dependabot.yml")
-      dependabot.write(dependabot.read.sub('          - "*"', '          - "actions/*"'))
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["schedule"] = ["* 12-15 * * 1"]
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
 
       result, _output, errors = validate(root)
 
       refute result
-      assert_includes errors, "differs from the canonical reviewed GitHub Actions update policy"
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
     end
   end
 
-  def test_rejects_disabled_dependabot_updates
+  def test_rejects_enabled_renovate_vulnerability_alerts
     with_repository_copy do |root|
-      dependabot = root.join(".github/dependabot.yml")
-      dependabot.write(dependabot.read.sub("open-pull-requests-limit: 5", "open-pull-requests-limit: 0"))
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["vulnerabilityAlerts"]["enabled"] = true
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
 
       result, _output, errors = validate(root)
 
       refute result
-      assert_includes errors, "differs from the canonical reviewed GitHub Actions update policy"
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
     end
   end
 
-  def test_rejects_dependabot_ignore_rules
+  def test_rejects_renovate_minimum_release_age_drift
     with_repository_copy do |root|
-      dependabot = root.join(".github/dependabot.yml")
-      dependabot.write(dependabot.read.sub(
-        "    groups:\n",
-        "    ignore:\n      - dependency-name: \"*\"\n    groups:\n",
-      ))
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["minimumReleaseAge"] = "4 days"
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
 
       result, _output, errors = validate(root)
 
       refute result
-      assert_includes errors, "differs from the canonical reviewed GitHub Actions update policy"
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
     end
   end
 
-  def test_rejects_dependabot_allow_filter
+  def test_rejects_renovate_without_action_digest_pinning
     with_repository_copy do |root|
-      dependabot = root.join(".github/dependabot.yml")
-      dependabot.write(dependabot.read.sub(
-        "    groups:\n",
-        "    allow:\n      - dependency-name: never-match\n    groups:\n",
-      ))
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["extends"].delete("helpers:pinGitHubActionDigests")
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
 
       result, _output, errors = validate(root)
 
       refute result
-      assert_includes errors, "differs from the canonical reviewed GitHub Actions update policy"
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
+    end
+  end
+
+  def test_rejects_renovate_automerge_policy
+    with_repository_copy do |root|
+      renovate = JSON.parse(root.join("renovate.json").read)
+      renovate["packageRules"] = [{
+        "matchManagers" => ["github-actions"],
+        "automerge" => true,
+      }]
+      root.join("renovate.json").write("#{JSON.pretty_generate(renovate)}\n")
+
+      result, _output, errors = validate(root)
+
+      refute result
+      assert_includes errors, "differs from the canonical reviewed Renovate update policy"
     end
   end
 
@@ -388,6 +402,7 @@ class RepositoryMetadataValidatorTest < Minitest::Test
         REPOSITORY_ROOT.join("workflow-templates"),
         root.join("workflow-templates"),
       )
+      FileUtils.cp(REPOSITORY_ROOT.join("renovate.json"), root.join("renovate.json"))
       yield root
     end
   end

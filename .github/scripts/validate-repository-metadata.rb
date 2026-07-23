@@ -17,23 +17,29 @@ class RepositoryMetadataValidator
     "pull-requests" => "read",
     "security-events" => "write",
   }.freeze
-  DEPENDABOT_CONFIGURATION = {
-    "version" => 2,
-    "updates" => [
+  RENOVATE_CONFIGURATION = {
+    "$schema" => "https://docs.renovatebot.com/renovate-schema.json",
+    "extends" => [
+      "config:recommended",
+      "helpers:pinGitHubActionDigests",
+    ],
+    "timezone" => "America/Chicago",
+    "schedule" => ["* 8-11 * * 1"],
+    "labels" => ["dependencies"],
+    "prConcurrentLimit" => 5,
+    "prHourlyLimit" => 2,
+    "minimumReleaseAge" => "5 days",
+    "minimumReleaseAgeBehaviour" => "timestamp-required",
+    "internalChecksFilter" => "strict",
+    "enabledManagers" => ["github-actions"],
+    "vulnerabilityAlerts" => {
+      "enabled" => false,
+    },
+    "packageRules" => [
       {
-        "package-ecosystem" => "github-actions",
-        "directory" => "/",
-        "schedule" => {
-          "interval" => "weekly",
-          "day" => "monday",
-          "time" => "09:30",
-        },
-        "open-pull-requests-limit" => 5,
-        "groups" => {
-          "github-actions" => {
-            "patterns" => ["*"],
-          },
-        },
+        "description" => "Group reviewable GitHub Actions updates.",
+        "matchManagers" => ["github-actions"],
+        "groupName" => "GitHub Actions",
       },
     ],
   }.freeze
@@ -42,6 +48,7 @@ class RepositoryMetadataValidator
     @root = Pathname(root).expand_path
     @errors = []
     @yaml_documents = {}
+    @json_documents = {}
   end
 
   def validate
@@ -49,7 +56,7 @@ class RepositoryMetadataValidator
     validate_action_pins
     validate_scorecard_workflow
     validate_security_template
-    validate_dependabot
+    validate_renovate
     validate_code_ownership
 
     unless @errors.empty?
@@ -77,7 +84,6 @@ class RepositoryMetadataValidator
       *@root.glob(".github/actions/**/action.yaml"),
       *@root.glob("workflow-templates/*.yml"),
       *@root.glob("workflow-templates/*.yaml"),
-      @root.join(".github/dependabot.yml"),
       @root.join("action.yml"),
       @root.join("action.yaml"),
     ].select(&:file?).uniq.sort
@@ -95,9 +101,13 @@ class RepositoryMetadataValidator
       @errors << "#{name} is not valid safe YAML: #{error.message}"
     end
 
-    @root.glob("workflow-templates/*.json").sort.each do |path|
+    json_paths = [
+      *@root.glob("workflow-templates/*.json"),
+      @root.join("renovate.json"),
+    ].select(&:file?).uniq.sort
+    json_paths.each do |path|
       name = relative(path)
-      JSON.parse(path.read)
+      @json_documents[name] = JSON.parse(path.read)
       puts "JSON OK #{name}"
     rescue JSON::ParserError => error
       @errors << "#{name} is not valid JSON: #{error.message}"
@@ -407,16 +417,16 @@ class RepositoryMetadataValidator
     @errors << "#{name} must upload Scorecard SARIF" unless upload&.dig("with", "sarif_file") == "scorecard.sarif"
   end
 
-  def validate_dependabot
-    name = ".github/dependabot.yml"
-    configuration = @yaml_documents[name]
+  def validate_renovate
+    name = "renovate.json"
+    configuration = @json_documents[name]
     unless configuration.is_a?(Hash)
       @errors << "#{name} is missing or did not parse as a mapping"
       return
     end
 
-    unless configuration == DEPENDABOT_CONFIGURATION
-      @errors << "#{name} differs from the canonical reviewed GitHub Actions update policy"
+    unless configuration == RENOVATE_CONFIGURATION
+      @errors << "#{name} differs from the canonical reviewed Renovate update policy"
     end
   end
 
@@ -440,7 +450,7 @@ class RepositoryMetadataValidator
       "/workflow-templates/ @dannysauer",
       "/CODE_OF_CONDUCT.md @dannysauer",
       "/SECURITY.md @dannysauer",
-      "/.github/dependabot.yml @dannysauer",
+      "/renovate.json @dannysauer",
       "/.github/scripts/ @dannysauer",
       "/.github/workflows/ @dannysauer",
     ]

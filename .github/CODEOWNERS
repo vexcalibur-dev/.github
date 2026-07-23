@@ -11,6 +11,6 @@
 /SECURITY.md @dannysauer
 
 # Keep security automation last so later rules cannot replace its owner.
-/.github/dependabot.yml @dannysauer
+/renovate.json @dannysauer
 /.github/scripts/ @dannysauer
 /.github/workflows/ @dannysauer
