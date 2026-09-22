@@ -2,30 +2,19 @@
 
 ![Vexcalibur wordmark beside a stylized sword](assets/vexcalibur-banner.png)
 
-Vexcalibur is an open source toolkit for turning software inventory and vulnerability findings into Vulnerability Exploitability eXchange (VEX) documents. The core runs from a local shell or Python, and a companion GitHub Action brings it into repository workflows. CircleCI orb source is available but has not reached the registry.
-
-The core tool reads CycloneDX 1.4–1.6 JSON or XML software bills of materials (SBOMs). It can also fetch an SPDX 2.3 SBOM from the GitHub Dependency Graph. Findings can come from a local file or an OSV-compatible service.
-
-[Vexcalibur 0.3.1](https://github.com/vexcalibur-dev/vexcalibur/releases/tag/v0.3.1) is the current release. It natively emits [CycloneDX 1.6 VEX JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/cyclonedx-vex-output.html), [OpenVEX 0.2.0 JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/openvex-output.html), and [CSAF 2.0 JSON](https://vexcalibur-dev.github.io/vexcalibur/reference/csaf-output.html) with the `csaf_vex` profile. CSAF output first shipped in [Vexcalibur 0.3.0](https://github.com/vexcalibur-dev/vexcalibur/releases/tag/v0.3.0).
-
-Vexcalibur does not read VEX documents or convert between VEX formats. OpenVEX and CSAF support is output-only.
-
-Vexcalibur does not turn a vulnerability database match into an exploitability decision. OSV findings enter the document as `in_triage`; a local findings file carries the assessment its author supplied.
+Vexcalibur helps security and release engineers generate Vulnerability Exploitability eXchange (VEX) documents from software bills of materials (SBOMs) and vulnerability findings. The projects in this organization bring that workflow to local tools and continuous integration.
 
 ## Start here
 
-Follow the [Vexcalibur quickstart](https://vexcalibur-dev.github.io/vexcalibur/tutorials/quickstart.html) to generate a VEX document without sending package data over the network. The [complete manual](https://vexcalibur-dev.github.io/vexcalibur/) covers network trust boundaries, command behavior, and the Python API. Its format references define each output contract.
-
-Vexcalibur uses a 0.x version line. Pin exact releases in automation because command flags, Python APIs, action inputs, and output details can change.
+Start with the [Vexcalibur quickstart](https://vexcalibur-dev.github.io/vexcalibur/tutorials/quickstart.html). For installation, supported formats, data-sharing controls, and API details, use the [product documentation](https://vexcalibur-dev.github.io/vexcalibur/). The [compatibility policy](https://vexcalibur-dev.github.io/vexcalibur/reference/compatibility.html) explains the guarantees for each release series.
 
 ## Projects
 
-| Project | What it provides | Availability |
+| Project | Purpose | Details |
 | --- | --- | --- |
-| [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) | Command-line tool and typed Python library | [Version 0.3.1 on PyPI](https://pypi.org/project/vexcalibur/0.3.1/) |
-| [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action) | Composite GitHub Action that installs and runs an exact Vexcalibur package release | [Versioned GitHub releases](https://github.com/vexcalibur-dev/vexcalibur-action/releases) |
-| [vexcalibur-orb](https://github.com/vexcalibur-dev/vexcalibur-orb) | CircleCI orb source for the same isolated install and execution boundary | Source is available; no CircleCI registry release yet |
-| [.github](https://github.com/vexcalibur-dev/.github) | Organization profile, community defaults, and optional workflow templates | Used across the organization |
+| [vexcalibur](https://github.com/vexcalibur-dev/vexcalibur) | Command-line tool and typed Python library | [PyPI package](https://pypi.org/project/vexcalibur/) and [latest release](https://github.com/vexcalibur-dev/vexcalibur/releases/latest) |
+| [vexcalibur-action](https://github.com/vexcalibur-dev/vexcalibur-action) | GitHub Actions integration | [Usage and configuration](https://github.com/vexcalibur-dev/vexcalibur-action#readme) and [Marketplace listing](https://github.com/marketplace/actions/vexcalibur-action) |
+| [vexcalibur-orb](https://github.com/vexcalibur-dev/vexcalibur-orb) | CircleCI integration | [Usage and configuration](https://github.com/vexcalibur-dev/vexcalibur-orb#readme) and [Orb registry](https://circleci.com/developer/orbs/orb/vexcalibur-dev/vexcalibur) |
 
 ## Get help or contribute
 
